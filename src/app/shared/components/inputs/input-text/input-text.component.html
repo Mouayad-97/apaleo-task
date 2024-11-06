@@ -1,0 +1,43 @@
+<label class="group block relative">
+  <span class="block font-medium">{{ label() }} </span>
+</label>
+
+<div
+  [ngClass]="size"
+  class="group input-form {{
+    inputColor()
+  }} flex items-center justify-start relative"
+>
+  @if(prefixTemplate){
+  <span #prefixWrapper class="absolute inset-y-0 left-3 flex items-center">
+    <ng-container *ngTemplateOutlet="prefixTemplate"></ng-container>
+  </span>
+  }
+
+  <ng-container *ngTemplateOutlet="input"></ng-container>
+
+  @if(suffixTemplate){
+  <span #suffixWrapper class="absolute inset-y-0 right-3 flex items-center">
+    <ng-container *ngTemplateOutlet="suffixTemplate"></ng-container>
+  </span>
+  }
+</div>
+
+<ng-template #input>
+  <input
+    [id]="inputId()"
+    [ngClass]="klass()"
+    [readonly]="disabled()"
+    [autocomplete]="autocomplete() ? 'on' : 'off'"
+    [type]="type()"
+    [placeholder]="placeholder()"
+    (input)="setValue($event)"
+    [formControl]="control"
+    [attr.aria-label]="ariaLabel()"
+    [attr.aria-labelledby]="ariaLabelledBy()"
+    [ngStyle]="{
+      'padding-left.px': prefixPadding,
+      'padding-right.px': suffixPadding
+    }"
+  />
+</ng-template>

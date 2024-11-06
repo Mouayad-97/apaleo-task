@@ -1,0 +1,85 @@
+<div
+  class="flex justify-center items-center gap-4 p-4 bg-gray-200 dark:bg-gray-800 rounded-lg shadow w-full"
+>
+  <!-- First Button -->
+  <ng-container
+    *ngTemplateOutlet="
+      actionButton;
+      context: {
+        action: paginationAction['FIRST'],
+        disabled: currentPage() === 1,
+        icon: assets['double-left-chevron']
+      }
+    "
+  ></ng-container>
+
+  <!-- Previous Button -->
+  <ng-container
+    *ngTemplateOutlet="
+      actionButton;
+      context: {
+        action: paginationAction['PREVIOUS'],
+        disabled: currentPage() === 1,
+        icon: assets['left-chevron']
+      }
+    "
+  ></ng-container>
+
+  <span class="text-gray-700 dark:text-gray-200 font-medium text-base">
+    Page {{ currentPage() }} of {{ totalPages() }}
+  </span>
+
+  <!-- Next Button -->
+  <ng-container
+    *ngTemplateOutlet="
+      actionButton;
+      context: {
+        action: paginationAction['NEXT'],
+        disabled: currentPage() === totalPages(),
+        icon: assets['right-chevron']
+      }
+    "
+  ></ng-container>
+
+  <!-- Last Button -->
+  <ng-container
+    *ngTemplateOutlet="
+      actionButton;
+      context: {
+        action: paginationAction['LAST'],
+        disabled: currentPage() === totalPages(),
+        icon: assets['double-right-chevron']
+      }
+    "
+  ></ng-container>
+
+  <select
+    (change)="onPageSizeChange($event)"
+    class="ml-4 px-2 py-1.5 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+  >
+    @for(pageSize of pageSizeOptions(); track pageSize){
+    <option [value]="pageSize" [selected]="pageSize === limit()">
+      {{ pageSize }}
+    </option>
+    }
+  </select>
+</div>
+
+<ng-template
+  #actionButton
+  let-action="action"
+  let-disabled="disabled"
+  let-icon="icon"
+>
+  <button
+    (click)="action && action()"
+    [disabled]="disabled"
+    class="flex items-center gap-2 px-3 py-1.5 bg-blue-500 text-white dark:bg-blue-600 rounded disabled:bg-blue-300 dark:disabled:bg-blue-400 hover:bg-blue-600 dark:hover:bg-blue-700 transition"
+  >
+    @if(icon){
+    <ng-container>
+      <img [ngSrc]="icon.url" [width]="icon.width" [height]="icon.height" />
+    </ng-container>
+    }
+  </button>
+</ng-template>

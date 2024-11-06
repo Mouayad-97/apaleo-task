@@ -1,0 +1,7 @@
+{
+  "ENVIRONMENTS_URLS": {
+    "DEV": "https://dummyjson.com"
+  },
+  "API_VERSION": "",
+  "BASE_ENVIRONMENT": "DEV"
+}

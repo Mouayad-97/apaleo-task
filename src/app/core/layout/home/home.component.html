@@ -1,0 +1,78 @@
+<div
+  class="w-screen h-[85vh] bg-cover bg-center flex items-center justify-center dark:bg-gray-900"
+>
+  <img
+    [ngSrc]="doneIcon.url"
+    [width]="doneIcon.width"
+    [height]="doneIcon.height"
+    [alt]="doneIcon.alt"
+    class="hidden md:block w-[200px] lg:w-[400px]"
+  />
+  <div
+    class="w-11/12 sm:w-10/12 md:w-8/12 lg:w-7/12 p-4 sm:p-6 md:p-8 bg-white/30 dark:bg-gray-800/40 backdrop-blur-md rounded-lg shadow-lg text-left relative"
+  >
+    <h2
+      class="text-xl sm:text-2xl font-bold text-gray-800 dark:text-gray-200 mb-4 sm:mb-6 text-center underline"
+    >
+      Project Checklist
+    </h2>
+
+    <!-- Task List -->
+    <ul class="space-y-4 sm:space-y-4 text-xs sm:text-sm md:text-base">
+      @for(task of tasks;track task){
+      <ng-container
+        *ngTemplateOutlet="taskTemplate; context: { $implicit: task }"
+      ></ng-container>
+      }
+    </ul>
+
+    <p
+      class="mt-4 sm:mt-6 text-xs sm:text-sm text-gray-600 dark:text-gray-400 pb-6 sm:pb-10"
+    >
+      Using generics in these structures enhances type safety, making the code
+      more robust and maintainable.
+      <br />
+      <small class="text-xs italic text-blue-600 dark:text-blue-300"
+        >Done By : Mouayad Aloula 🎉</small
+      >
+    </p>
+
+    <button
+      class="absolute bottom-4 right-4 flex items-center px-3 py-1.5 sm:px-4 sm:py-2 bg-blue-600 dark:bg-blue-500 text-white rounded-full hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors text-xs sm:text-sm"
+      (click)="goToUserList()"
+    >
+      <span>Go to Users</span>
+      <!-- Right Arrow Icon -->
+      <svg
+        class="w-4 h-4 ml-2"
+        fill="currentColor"
+        viewBox="0 0 20 20"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          fill-rule="evenodd"
+          d="M10.293 14.707a1 1 0 010-1.414L13.586 10H3a1 1 0 110-2h10.586l-3.293-3.293a1 1 0 011.414-1.414l5 5a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0z"
+          clip-rule="evenodd"
+        ></path>
+      </svg>
+    </button>
+  </div>
+
+  <ng-template #taskTemplate let-task>
+    <li class="flex items-center space-x-2 sm:space-x-3">
+      <!-- SVG Check Icon -->
+      <span class="flex items-center justify-center text-green-500">
+        <img
+          [ngSrc]="checkIcon.url"
+          [width]="checkIcon.width"
+          [height]="checkIcon.height"
+          [alt]="checkIcon.alt"
+        />
+      </span>
+      <span
+        class="text-gray-700 dark:text-gray-300 text-xs sm:text-sm md:text-base"
+        >{{ task }}</span
+      >
+    </li>
+  </ng-template>
+</div>

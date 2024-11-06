@@ -1,0 +1,45 @@
+<!-- Sort icon button -->
+<button (click)="sort()" class="ml-2 cursor-pointer">
+  @if(col().order; as order){
+  <img
+    [ngSrc]="
+      assets[
+        order === 'asc'
+          ? 'arrow-up'
+          : order === 'desc'
+          ? 'arrow-down'
+          : 'arrow-up'
+      ].url
+    "
+    [width]="
+      assets[
+        order === 'asc'
+          ? 'arrow-up'
+          : order === 'desc'
+          ? 'arrow-down'
+          : 'arrow-up'
+      ].width
+    "
+    [height]="
+      assets[
+        order === 'asc'
+          ? 'arrow-up'
+          : order === 'desc'
+          ? 'arrow-down'
+          : 'arrow-up'
+      ].height
+    "
+    [alt]="
+      assets[
+        order === 'asc'
+          ? 'arrow-up'
+          : order === 'desc'
+          ? 'arrow-down'
+          : 'arrow-up'
+      ].alt
+    "
+    [class.opacity-40]="order === 'none'"
+  />
+  }
+  <!-- Conditionally show ascending or descending icon based on direction -->
+</button>

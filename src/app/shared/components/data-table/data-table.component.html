@@ -1,0 +1,152 @@
+<div class="m-5">
+  <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">User List</h1>
+  <ul class="text-sm text-gray-600 mb-4">
+    <li class="list-none">
+      This table allows you to search, filter, paginate, and sort data. Please
+      note:
+    </li>
+    <li class="list-disc list-inside">
+      <strong>Search</strong> and <strong>filter</strong> can be used with
+      pagination and sorting individually.
+    </li>
+    <li class="list-disc list-inside">
+      <strong>Search and filter together</strong> aren’t supported due to API
+      limitations. If both are entered, only the last action (either search or
+      filter) will apply, clearing the previous one.
+    </li>
+  </ul>
+</div>
+<div
+  class="m-5 max-h-[80vh] overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-track]:bg-neutral-700 dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500"
+>
+  <div class="relative">
+    <!-- Loading Overlay -->
+    @if(loadingSubject$ | async){
+    <ng-container [ngTemplateOutlet]="loader"></ng-container>
+    }
+    <table
+      class="w-full table-fixed text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 border border-gray-300 dark:border-gray-600 rounded-lg"
+    >
+      <thead
+        class="sticky top-0 z-10 text-base text-gray-700 uppercase bg-slate-50 dark:bg-gray-700 dark:text-gray-400"
+      >
+        <tr class="bg-slate-100 dark:bg-gray-800">
+          <th [attr.colspan]="columnsWrapper().colNames.size + 1">
+            <ng-container [ngTemplateOutlet]="searchInput"></ng-container>
+          </th>
+        </tr>
+        <tr>
+          <th
+            class="text-center px-6 py-3 border-gray-300 dark:border-gray-600 w-4/12"
+          >
+            #
+          </th>
+          @for (col of columnsWrapper()!.filterNames; track col) {
+          <th
+            class="group text-center px-6 py-3 border-gray-300 dark:border-gray-600 w-4/12 min-w-[120px]"
+          >
+            <div class="flex items-center justify-center">
+              <span>{{
+                columnsWrapper()!.colsMap[col].config.displayName
+              }}</span>
+              @if (columnsWrapper()!.colsMap[col].config.sortable) {
+              <app-column-sorter
+                [ngClass]="{
+                  'opacity-100': columnsWrapper()!.colsMap[col].isActiveSort,
+                  'opacity-0 group-hover:opacity-100':
+                    !columnsWrapper()!.colsMap[col].isActiveSort
+                }"
+                (onSort)="sort($event)"
+                [col]="columnsWrapper()!.colsMap[col]"
+                class="inline-block ml-2 transition-opacity duration-300"
+              ></app-column-sorter>
+              }
+            </div>
+          </th>
+          }
+        </tr>
+        <tr class="bg-slate-100 dark:bg-gray-800">
+          <th
+            class="text-center px-6 py-3 border-gray-300 dark:border-gray-600"
+          ></th>
+          @for (col of columnsWrapper()!.filterNames; track col) {
+          <th
+            class="text-center px-6 py-3 border-gray-300 dark:border-gray-600"
+          >
+            @if(columnsWrapper()!.colsMap[col].config.filter){
+            <app-column-filter
+              [col]="columnsWrapper()!.colsMap[col]"
+              (filterChange)="filterChange($event)"
+            ></app-column-filter>
+            }
+          </th>
+          }
+        </tr>
+      </thead>
+      <tbody class="bg-white dark:bg-gray-900">
+        @for(item of data$ | async; track item; let i = $index){
+        <tr class="border-b border-gray-300 dark:border-gray-700">
+          <td
+            class="text-center px-6 py-3 truncate text-black dark:text-gray-100"
+          >
+            {{ i + 1 }}
+          </td>
+          @for(col of columnsWrapper()!.colNames; track col){
+          <td
+            class="text-center px-6 py-3 truncate text-lg text-black dark:text-gray-100"
+            [title]="item[col]"
+          >
+            {{ item[col] }}
+          </td>
+          }
+        </tr>
+        }
+      </tbody>
+      <tfoot
+        class="bg-white dark:bg-gray-900 sticky bottom-0 shadow-inner shadow-sm shadow-gray-500"
+      >
+        <tr>
+          <td
+            [attr.colspan]="columnsWrapper().colNames.size + 1"
+            class="px-6 py-3 text-center"
+          >
+            <app-paginator
+              [total]="total()"
+              [limit]="limit()"
+              [skip]="skip()"
+              (onPaginate)="paginate($event)"
+            ></app-paginator>
+          </td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</div>
+
+<ng-template #loader>
+  <div
+    class="absolute inset-0 flex items-center justify-center bg-white bg-opacity-75 dark:bg-gray-900 dark:bg-opacity-75 z-20"
+  >
+    <div class="loader"></div>
+  </div>
+</ng-template>
+
+<ng-template #searchInput>
+  <app-input-text
+    type="text"
+    [placeholder]="'Search By frist name, last name...'"
+    klass="m-4 font-medium bg-gray-50 border border-gray-300 text-gray-900 text-base  rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+    [formControl]="searchForm"
+  >
+    <ng-template ApaleoTemplate="prefix">
+      @let searchIcon = assets['search'];
+      <img
+        class="m-3 opacity-50 dark:invert"
+        [ngSrc]="searchIcon.url"
+        [width]="searchIcon.width"
+        [height]="searchIcon.height"
+        [alt]="searchIcon.alt"
+      />
+    </ng-template>
+  </app-input-text>
+</ng-template>
