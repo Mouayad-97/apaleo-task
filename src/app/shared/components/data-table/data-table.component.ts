@@ -11,8 +11,10 @@ import {
   inject,
   DestroyRef,
   signal,
+  booleanAttribute,
+  effect,
 } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { ReactiveFormsModule, FormControl } from '@angular/forms';
 import { ASSETS } from '@core/providers';
 import { DEFAULT_PAGINATION_DATA } from '@shared/constants';
@@ -32,6 +34,8 @@ import {
   tap,
   map,
   debounceTime,
+  skipWhile,
+  filter,
 } from 'rxjs';
 import { ColumnFilterComponent } from '../column-filter';
 import { ColumnSorterComponent } from '../column-sorter';
@@ -59,6 +63,10 @@ import { PaginatorComponent } from '../paginator';
 export class DataTableComponent<T> implements OnInit {
   columnsWrapper = input.required<ColumnsWrapper<T>>();
 
+  filterUI = input<boolean>();
+
+  allData = input<T[]>();
+
   delaySearch = input<number>(250);
 
   data$ = this.load();
@@ -75,7 +83,9 @@ export class DataTableComponent<T> implements OnInit {
     SortOptions<T> | undefined
   >(1);
 
-  filter$ = new BehaviorSubject<FilterOptions<T>>({} as FilterOptions<T>);
+  filter$ = new BehaviorSubject<FilterOptions<T> | FilterOptions<T>[]>(
+    {} as FilterOptions<T>
+  );
 
   skip = signal<number>(DEFAULT_PAGINATION_DATA.SKIP);
   limit = signal<number>(DEFAULT_PAGINATION_DATA.LIMIT);
@@ -94,6 +104,9 @@ export class DataTableComponent<T> implements OnInit {
 
   loadingSubject$ = new BehaviorSubject<boolean>(false);
 
+  filterUi$ = toObservable(this.filterUI);
+  allData$ = toObservable(this.allData);
+
   ngOnInit(): void {
     //attach filter subject for the columns
     this.columnsWrapper().attachFilter(this.filter$);
@@ -103,27 +116,64 @@ export class DataTableComponent<T> implements OnInit {
 
   private load(): Observable<T[]> {
     return of(undefined)
-      .pipe(delay(0)) // need it to make little delay till the userFilter input get bind.
+      .pipe(delay(0))
+      .pipe(switchMap(() => this.filterUi$))
+      .pipe(filter((isFilterUI) => isFilterUI !== undefined))
       .pipe(
-        switchMap(() => {
+        switchMap((isFilterUI) => {
           return combineLatest([
+            of(isFilterUI),
+            this.allData$,
             this.paginate$,
             this.filter$,
             this.sort$,
             this.search$,
-          ]).pipe(
-            switchMap(([paginationOptions, filter, sort, search]) => {
-              this.loadingSubject$.next(true);
-              return this.service
-                .load(paginationOptions, filter, sort, search)
-                .pipe(finalize(() => this.loadingSubject$.next(false)));
-            }),
-            tap(({ paginationData }) => {
-              this.total.set(paginationData.total);
-              this.loadingSubject$.next(false);
-            }),
-            map((response) => response.rs)
-          );
+          ])
+            .pipe(
+              filter(([isFilterUI, allData]) => {
+                return (
+                  isFilterUI === false ||
+                  (isFilterUI === true &&
+                    allData !== null &&
+                    allData !== undefined)
+                );
+              })
+            )
+            .pipe(
+              switchMap(
+                ([
+                  isFilterUI,
+                  allData,
+                  paginationOptions,
+                  filter,
+                  sort,
+                  search,
+                ]) => {
+                  this.loadingSubject$.next(true);
+                  if (isFilterUI) {
+                    return this.service.loadDataUI(
+                      allData!,
+                      paginationOptions,
+                      filter as FilterOptions<T>[],
+                      sort
+                    );
+                  }
+                  return this.service
+                    .load(
+                      paginationOptions,
+                      filter as FilterOptions<T>,
+                      sort,
+                      search
+                    )
+                    .pipe(finalize(() => this.loadingSubject$.next(false)));
+                }
+              ),
+              tap(({ paginationData }) => {
+                this.total.set(paginationData.total);
+                this.loadingSubject$.next(false);
+              }),
+              map((response) => response.rs)
+            );
         })
       );
   }
@@ -145,22 +195,52 @@ export class DataTableComponent<T> implements OnInit {
   }
 
   filterChange($event: FilterOptions<T>) {
+    const isFilterUIArray = this.filterUI(); // Determine if filterUI is in array mode
+
+    // If the filter value is null, undefined, or an empty string, we need to remove the filter
     if (
-      // Comparing value with null only makes a problem when value is 0 (falsy)
       $event.value === null ||
       $event.value === undefined ||
       $event.value === ''
     ) {
-      delete this.filter$.value.value;
-      this.filter$.next({ ...this.filter$.value });
+      if (isFilterUIArray) {
+        // Remove the filter with the matching key from the array
+        const newFilters = (this.filter$.value as FilterOptions<T>[]).filter(
+          (f) => f.key !== $event.key
+        );
+        this.filter$.next([...newFilters]); // Update the filter array
+      } else {
+        // For single filter mode, just delete the value
+        delete (this.filter$.value as FilterOptions<T>).value;
+        this.filter$.next({ ...this.filter$.value });
+      }
       return;
     }
+
+    // Reset paginator and search form on every filter change
     this.resetPaginator();
-    this.resetSearchForm();
-    this.filter$.next({
-      key: $event.key,
-      value: $event.value,
-    });
+
+    if (isFilterUIArray) {
+      this.resetSearchForm();
+      // When filterUI is true, ensure `filter$` is treated as an array
+      const currentFilters = Array.isArray(this.filter$.value)
+        ? this.filter$.value
+        : [];
+
+      // Update the array by replacing any existing filter with the same key, or adding the new filter
+      const updatedFilters = [
+        ...currentFilters.filter((f) => f.key !== $event.key), // Exclude the old filter with the same key
+        { key: $event.key, value: $event.value }, // Add the new filter
+      ];
+
+      this.filter$.next(updatedFilters); // Emit the updated filter array
+    } else {
+      // If not in array mode, handle as a single filter object
+      this.filter$.next({
+        key: $event.key,
+        value: $event.value,
+      });
+    }
   }
 
   private listenToValueChange() {

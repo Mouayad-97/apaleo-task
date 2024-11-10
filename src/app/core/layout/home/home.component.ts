@@ -26,6 +26,7 @@ export class HomeComponent {
     'Custom Directives: Create directives for flexible content projection with ng-template.',
     'Unified Data Operations: Combine filtering, sorting, searching, and pagination into a reactive flow.',
     'Subscription Cleanup: Ensure all subscriptions are properly destroyed to prevent memory leaks.',
+    'Add the option to choose between backend and frontend filtering, selectable by the user on page load.',
   ];
 
   goToUserList() {

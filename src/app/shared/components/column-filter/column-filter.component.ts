@@ -6,6 +6,7 @@ import {
   DestroyRef,
   input,
   output,
+  booleanAttribute,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ReactiveFormsModule, FormControl } from '@angular/forms';
@@ -39,6 +40,8 @@ export class ColumnFilterComponent<M> implements OnInit {
 
   filterChange = output<FilterOptions<M>>();
 
+  clearAllExceptCurrent = input(false, { transform: booleanAttribute });
+
   get filterIcon() {
     return ('' + this.control.value).length
       ? this.assets['filter-clear']
@@ -61,7 +64,9 @@ export class ColumnFilterComponent<M> implements OnInit {
             key: this.col().config.name as RecursiveKeys<M> & string,
             value,
           });
-        this.clearAllFiltersExceptCurrent();
+        if (this.clearAllExceptCurrent()) {
+          this.clearAllFiltersExceptCurrent();
+        }
       });
   }
 

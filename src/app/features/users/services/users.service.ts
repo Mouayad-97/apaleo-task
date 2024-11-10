@@ -25,6 +25,19 @@ export class UsersService extends BaseDataTableService<User> {
     super();
   }
 
+  getAllUsers() {
+    const url = this.urlService.URLS.USERS;
+    //get all data
+    const params = this.buildHttpParams({ limit: 0, skip: 0 });
+    return this.http
+      .get<UserResponse>(url, { params: params })
+      .pipe(
+        map((res) =>
+          this.handleResponse(res, 'users', (item) => new User(item))
+        )
+      );
+  }
+
   override requestHandler(
     paginationOptions?: PaginationOptions,
     filterOptions?: FilterOptions<User>,

@@ -9,7 +9,7 @@ export class ColumnsWrapper<M> {
   colNames = new Set<keyof M>();
   diplayNames: string[] = [];
   filterNames = new Set<string>();
-  filter$!: BehaviorSubject<FilterOptions<M>>;
+  filter$!: BehaviorSubject<FilterOptions<M> | FilterOptions<M>[]>;
   clear$ = new Subject<keyof M | void>();
   colsMap: Record<string, ColumnContract<M>> = {};
 
@@ -37,7 +37,9 @@ export class ColumnsWrapper<M> {
     } as ColumnContract<M>;
   }
 
-  attachFilter(filter: BehaviorSubject<FilterOptions<M>>): this {
+  attachFilter(
+    filter: BehaviorSubject<FilterOptions<M> | FilterOptions<M>[]>
+  ): this {
     this.filter$ = filter;
     return this;
   }

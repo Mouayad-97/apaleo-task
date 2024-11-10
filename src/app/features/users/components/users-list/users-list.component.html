@@ -1,1 +1,26 @@
-<app-data-table [columnsWrapper]="columns" />
+@if(!filterUI()){
+<div class="m-5">
+  <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">User List</h1>
+  <ul class="text-sm text-gray-600 mb-4">
+    <li class="list-none">
+      This table allows you to search, filter, paginate, and sort data. Please
+      note:
+    </li>
+    <li class="list-disc list-inside">
+      <strong>Search</strong> and <strong>filter</strong> can be used with
+      pagination and sorting individually.
+    </li>
+    <li class="list-disc list-inside">
+      <strong>Search and filter together</strong> aren’t supported due to API
+      limitations. If both are entered, only the last action (either search or
+      filter) will apply, clearing the previous one.
+    </li>
+  </ul>
+</div>
+}
+<ng-container #filterModeDialog></ng-container>
+<app-data-table
+  [columnsWrapper]="columns"
+  [filterUI]="filterUI()"
+  [allData]="(users$ | async)!"
+/>

@@ -1,0 +1,70 @@
+@if(showDialog) {
+
+<div
+  class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 sm:p-0 backdrop-blur-md"
+>
+  <div
+    class="bg-slate-100 dark:bg-gray-800 rounded-lg shadow-lg p-6 sm:p-8 max-w-lg w-full sm:w-auto"
+  >
+    <h2
+      class="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-6 text-center"
+    >
+      Choose Filtering Mode
+    </h2>
+
+    <div class="flex flex-col sm:flex-row justify-around items-stretch gap-4">
+      <!-- Frontend Filtering Section -->
+      <div
+        (click)="selectMode('frontend')"
+        [class.border-blue-500]="selectedMode === 'frontend'"
+        [class.bg-blue-100]="selectedMode === 'frontend'"
+        [class.dark:bg-gray-700]="selectedMode === 'frontend'"
+        [class.shadow-2xl]="selectedMode === 'frontend'"
+        [class.scale-105]="selectedMode === 'frontend'"
+        class="flex-1 flex flex-col items-start border-2 border-dashed rounded-lg p-6 cursor-pointer transition-all duration-300 hover:shadow-lg transform dark:border-gray-600"
+      >
+        <h3 class="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">
+          Frontend Filtering
+        </h3>
+        <p class="text-sm text-gray-600 dark:text-gray-400">
+          You can apply multiple filters simultaneously, such as filtering by
+          both first name and last name. Filtering is case-sensitive, and
+          sorting and pagination are handled on the client side, allowing for a
+          fast and flexible user experience.
+        </p>
+      </div>
+
+      <!-- Backend Filtering Section -->
+      <div
+        (click)="selectMode('backend')"
+        [class.border-blue-500]="selectedMode === 'backend'"
+        [class.bg-blue-100]="selectedMode === 'backend'"
+        [class.dark:bg-gray-700]="selectedMode === 'backend'"
+        [class.shadow-2xl]="selectedMode === 'backend'"
+        [class.scale-105]="selectedMode === 'backend'"
+        class="flex-1 flex flex-col items-start border-2 border-dashed rounded-lg p-6 cursor-pointer transition-all duration-300 hover:shadow-lg transform dark:border-gray-600"
+      >
+        <h3 class="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">
+          Backend Filtering
+        </h3>
+        <p class="text-sm text-gray-600 dark:text-gray-400">
+          You can apply only one filter at a time with backend filtering, where
+          each filter requires an exact match. Filtering is case-sensitive, but
+          search functionality is available for non-case-sensitive queries.
+          Pagination and sorting are also supported by the backend API.
+        </p>
+      </div>
+    </div>
+
+    <!-- Action Button -->
+    <div class="flex justify-center mt-6">
+      <button
+        (click)="confirmSelection()"
+        class="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 w-full sm:w-auto"
+      >
+        Confirm Selection
+      </button>
+    </div>
+  </div>
+</div>
+}

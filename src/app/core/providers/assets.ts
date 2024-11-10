@@ -76,8 +76,8 @@ export const assets: Record<AssetKey, Asset> = {
   'apaleo-logo': {
     url: 'assets/images/apaleo-logo.png',
     alt: 'apaleo-logo',
-    width: 100,
-    height: 100,
+    width: 120,
+    height: 65,
   },
   'check-icon': {
     url: 'assets/icons/check-icon.svg',
