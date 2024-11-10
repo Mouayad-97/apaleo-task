@@ -1,6 +1,4 @@
-import { Component, inject, output } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { FilterModeService } from '@shared/services/filter-mode.service';
+import { Component, output } from '@angular/core';
 
 @Component({
   selector: 'app-filter-mode',

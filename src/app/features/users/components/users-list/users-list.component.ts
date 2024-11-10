@@ -17,11 +17,11 @@ import {
   ColumnSorterComponent,
   InputTextComponent,
   ColumnFilterComponent,
+  FilterModeComponent,
 } from '@shared/components';
-import { FilterModeComponent } from '@shared/components/filter-mode/filter-mode.component';
 import { BaseDataTableService } from '@shared/services';
 import { ColumnsWrapper, Column, withFilter, withSort } from '@shared/utils';
-import { map, Observable, Subject, switchMap, tap } from 'rxjs';
+import { map, Subject, switchMap } from 'rxjs';
 
 @Component({
   selector: 'app-users-list',
